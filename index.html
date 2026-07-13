@@ -94,7 +94,7 @@ body{background:var(--g50);color:var(--g900);}
 #app-body{display:flex;flex:1;overflow:hidden;position:relative;}
 #main{flex:1;padding:28px;overflow-y:auto;transition:margin-left .3s;}
 #drawer{position:fixed;right:0;top:52px;height:calc(100vh - 92px);
-        width:300px;background:#fff;border-left:1px solid var(--g200);box-shadow:var(--sh-md);
+        width:450px;background:#fff;border-left:1px solid var(--g200);box-shadow:var(--sh-md);
         z-index:90;transform:translateX(100%);transition:transform .3s;display:flex;flex-direction:column;}
 #drawer.open{transform:translateX(0);}
 #drawer-toggle{position:fixed;right:0;top:50%;transform:translateY(-50%);z-index:91;
@@ -102,11 +102,11 @@ body{background:var(--g50);color:var(--g900);}
                padding:10px 6px;border-radius:var(--rsm) 0 0 var(--rsm);box-shadow:var(--sh-md);
                font-family:'Raleway',sans-serif;font-weight:700;font-size:11px;transition:right .3s;
                writing-mode:vertical-rl;}
-#drawer-toggle.open{right:300px;}
+#drawer-toggle.open{right:450px;}
 
 /* Drawer Persone (secondo pannello a destra, sotto quello Note) */
 #persone-drawer{position:fixed;right:0;top:52px;height:calc(100vh - 92px);
-        width:300px;background:#fff;border-left:1px solid var(--g200);box-shadow:var(--sh-md);
+        width:450px;background:#fff;border-left:1px solid var(--g200);box-shadow:var(--sh-md);
         z-index:89;transform:translateX(100%);transition:transform .3s;display:flex;flex-direction:column;}
 #persone-drawer.open{transform:translateX(0);}
 #persone-drawer-toggle{position:fixed;right:0;top:calc(50% + 90px);transform:translateY(-50%);z-index:88;
@@ -114,7 +114,7 @@ body{background:var(--g50);color:var(--g900);}
                padding:10px 6px;border-radius:var(--rsm) 0 0 var(--rsm);box-shadow:var(--sh-md);
                font-family:'Raleway',sans-serif;font-weight:700;font-size:11px;transition:right .3s;
                writing-mode:vertical-rl;}
-#persone-drawer-toggle.open{right:300px;}
+#persone-drawer-toggle.open{right:450px;}
 #persone-drawer-head{padding:16px;border-bottom:1px solid var(--g100);}
 #persone-drawer-head h3{font-size:13px;font-weight:700;color:var(--g700);text-transform:uppercase;letter-spacing:.5px;}
 #persone-drawer-filter-row{padding:12px 16px;border-bottom:1px solid var(--g100);}
@@ -287,9 +287,7 @@ body{background:var(--g50);color:var(--g900);}
            box-shadow:0 0 0 2px rgba(212,118,42,.25);}
 /* drawer task prioritari */
 .tv-item.prioritario .tv-text{font-weight:700;color:var(--g900);}
-.tv-item.prioritario::before{content:'';display:block;width:4px;border-radius:2px;
-  background:var(--orange);align-self:stretch;flex-shrink:0;margin-left:-6px;}
-.tv-item.prioritario{padding-left:10px;border-left:3px solid var(--orange);}
+.tv-item.prioritario{padding-left:10px;border-left:3px solid var(--orange);cursor:pointer;display:flex;align-items:flex-start;}
 /* multiselect dropdown categorie */
 .ms-wrap{position:relative;}
 .ms-trigger{min-width:180px;padding:7px 30px 7px 12px;border:1px solid var(--g200);border-radius:var(--rsm);
@@ -312,6 +310,30 @@ body{background:var(--g50);color:var(--g900);}
 .ms-clear{padding:8px 14px;border-top:1px solid var(--g100);font-size:12px;color:var(--g500);
   cursor:pointer;text-align:center;}
 .ms-clear:hover{color:var(--red);}
+
+/* Chip categorie (seconda fascia filtri board) */
+.cat-chip{
+  display:inline-flex;align-items:center;gap:6px;padding:5px 12px;
+  border-radius:20px;font-size:12px;font-weight:600;cursor:pointer;
+  border:1.5px solid var(--chip-col,var(--verde));
+  background:color-mix(in srgb, var(--chip-col,var(--verde)) 12%, #fff);
+  color:var(--chip-col,var(--verde));
+  transition:all .15s;font-family:'Raleway',sans-serif;
+}
+.cat-chip:hover{
+  background:color-mix(in srgb, var(--chip-col,var(--verde)) 22%, #fff);
+}
+.cat-chip.inactive{
+  border-color:var(--g200);background:var(--g100);color:var(--g300);
+}
+.cat-chip.inactive:hover{background:var(--g200);}
+.cat-chip-reset{
+  display:inline-flex;align-items:center;padding:5px 10px;
+  border-radius:20px;font-size:11px;font-weight:600;cursor:pointer;
+  border:1px solid var(--g200);background:none;color:var(--g500);
+  font-family:'Raleway',sans-serif;transition:all .15s;
+}
+.cat-chip-reset:hover{border-color:var(--red);color:var(--red);}
 
 /* Tag-input selezione persone */
 .pt-wrap{display:flex;flex-direction:column;gap:8px;}
@@ -1235,27 +1257,6 @@ function renderBoard(pb){
       <input class="filtro-input" id="f-testo" placeholder="Cerca progetto o task…" value="${esc(f.testo)}" oninput="onFiltroTesto(this.value)" style="width:200px;"/>
     </div>
     <div class="filtro-group">
-      <label>Categorie</label>
-      <div class="ms-wrap" id="ms-cat-wrap">
-        <div class="ms-trigger" id="ms-cat-trigger" onclick="toggleMsCat(event)">
-          ${f.categorie_ids.length===0?'Tutte':f.categorie_ids.length+' selezionat'+( f.categorie_ids.length===1?'a':'e')}
-        </div>
-        <div class="ms-dropdown" id="ms-cat-dd">
-          <div class="ms-search"><input type="text" id="ms-cat-search" placeholder="Cerca categoria…" oninput="filterMsCat(this.value)" onclick="event.stopPropagation()"/></div>
-          <div class="ms-list" id="ms-cat-list">
-            ${myCats.map(c=>`
-            <label class="ms-item">
-              <input type="checkbox" value="${c.id}" ${f.categorie_ids.includes(c.id)?'checked':''}
-                onchange="onMsCatChange()" onclick="event.stopPropagation()"/>
-              <span style="width:10px;height:10px;border-radius:50%;background:${esc(c.colore)};flex-shrink:0;display:inline-block;"></span>
-              ${esc(c.nome)}
-            </label>`).join('')}
-          </div>
-          <div class="ms-clear" onclick="clearMsCat()">Deseleziona tutto</div>
-        </div>
-      </div>
-    </div>
-    <div class="filtro-group">
       <label>Persona</label>
       <select class="filtro-sel" id="f-persona" onchange="onFiltroPersona(this.value)">
         <option value="">Tutte</option>
@@ -1278,6 +1279,22 @@ function renderBoard(pb){
     </div>
     <button id="filtri-reset" onclick="resetFiltri()">✕ Reset</button>
   </div>
+
+  <!-- Seconda fascia filtri: categorie come tag chips -->
+  ${myCats.length>0?`
+  <div id="filtri-cats-bar" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:14px;">
+    <span style="font-size:11px;font-weight:700;color:var(--g500);text-transform:uppercase;letter-spacing:.4px;white-space:nowrap;">Categorie:</span>
+    ${myCats.map(c=>{
+      const active = f.categorie_ids.length===0 || f.categorie_ids.includes(c.id);
+      return `<button class="cat-chip${active?'':' inactive'}" data-cat-id="${c.id}"
+        onclick="toggleCatChip('${c.id}')"
+        style="--chip-col:${esc(c.colore)};">
+        <span style="width:8px;height:8px;border-radius:50%;background:${active?esc(c.colore):'var(--g300)'};flex-shrink:0;display:inline-block;"></span>
+        ${esc(c.nome)}
+      </button>`;
+    }).join('')}
+    ${f.categorie_ids.length>0?`<button class="cat-chip-reset" onclick="clearMsCat()">✕ Tutte</button>`:''}
+  </div>`:''}
 
   <div id="board-wrap">
     <table class="board-table">
@@ -1594,23 +1611,47 @@ function onMsCatChange(){
   if(!checkboxes) return;
   const ids=[...checkboxes].filter(c=>c.checked).map(c=>c.value);
   S.boardFilter.categorie_ids=ids;
-  // Aggiorna solo la label del trigger senza ricostruire il DOM
-  const trigger=$('ms-cat-trigger');
-  if(trigger) trigger.innerHTML=
-    (ids.length===0?'Tutte':ids.length+' selezionat'+(ids.length===1?'a':'e'))+
-    ' <span style="font-size:10px;color:var(--g500);">▾</span>';
-  // Aggiorna solo il tbody del board, senza ricostruire filtri-bar
+  refreshBoardOnly();
+}
+// Toggle chip categoria nella seconda fascia filtri
+function toggleCatChip(catId){
+  const ids = S.boardFilter.categorie_ids;
+  const idx = ids.indexOf(catId);
+  if(idx===-1){
+    // Nessuna selezionata = "tutte attive": al primo click su uno chip, disattiva tutte le altre
+    if(ids.length===0){
+      const myCatIds = S.categorie.filter(c=>c.utente_id===S.user.id).map(c=>c.id);
+      // seleziona solo quella cliccata (le altre diventano inactive)
+      S.boardFilter.categorie_ids = [catId];
+    } else {
+      ids.push(catId);
+    }
+  } else {
+    ids.splice(idx,1);
+    // Se torniamo a 0 selezionati = tutte visibili
+  }
   refreshBoardOnly();
 }
 function clearMsCat(){
   S.boardFilter.categorie_ids=[];
-  const trigger=$('ms-cat-trigger');
-  if(trigger) trigger.innerHTML='Tutte <span style="font-size:10px;color:var(--g500);">▾</span>';
-  const checkboxes=$('ms-cat-list')?.querySelectorAll('input[type=checkbox]');
-  if(checkboxes) checkboxes.forEach(c=>c.checked=false);
   refreshBoardOnly();
 }
 function refreshBoardOnly(){
+  // Aggiorna stato visivo dei chip categorie
+  const activeIds = S.boardFilter.categorie_ids;
+  document.querySelectorAll('.cat-chip[data-cat-id]').forEach(chip=>{
+    const isActive = activeIds.length===0 || activeIds.includes(chip.dataset.catId);
+    chip.classList.toggle('inactive', !isActive);
+    // aggiorna pallino colore
+    const dot = chip.querySelector('span');
+    if(dot){
+      const cat = S.categorie.find(c=>c.id===chip.dataset.catId);
+      dot.style.background = isActive ? (cat?.colore||'var(--verde)') : 'var(--g300)';
+    }
+  });
+  // Mostra/nascondi pulsante reset categorie
+  const resetBtn = document.querySelector('.cat-chip-reset');
+  if(resetBtn) resetBtn.style.display = activeIds.length>0 ? '' : 'none';
   // Ricalcola e ridisegna solo le righe del board, lasciando intatta la filtri-bar
   renderDrawer();
   const pb=$('pb'); if(!pb) return;
@@ -2560,7 +2601,7 @@ function initDrawer(){
     S.drawerOpen=!S.drawerOpen;
     $('drawer').classList.toggle('open',S.drawerOpen);
     $('drawer-toggle').classList.toggle('open',S.drawerOpen);
-    $('main').style.marginRight = S.drawerOpen ? '300px' : '0';
+    $('main').style.marginRight = S.drawerOpen ? '450px' : '0';
   });
 
   $('drawer-add-btn').addEventListener('click', addTaskVeloce);
@@ -2620,10 +2661,14 @@ function renderDrawer(){
     <div style="padding:8px 16px 4px;font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--orange);">⚡ Prioritari</div>
     ${prioritari.map(t=>{
       const proj=S.progetti.find(p=>p.id===t.progetto_id);
+      const cat=proj?.categoria_id?S.categorie.find(c=>c.id===proj.categoria_id):null;
+      const sub=proj?.sottocategoria_id?S.sottocategorie.find(s=>s.id===proj.sottocategoria_id):null;
+      const breadcrumb=[cat?.nome,sub?.nome,proj?.nome].filter(Boolean).join(' | ');
       return `<div class="tv-item prioritario" onclick="openTaskDetail('${t.id}')" style="cursor:pointer;" title="Apri nel board">
-        <div class="tv-check" onclick="event.stopPropagation();quickCompleteTask('${t.id}')">·</div>
-        <div class="tv-text">${esc(t.nome)}</div>
-        ${proj?`<div class="tv-link" title="${esc(proj.nome)}">📋 ${esc(proj.nome)}</div>`:''}
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:10px;color:var(--g500);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${esc(breadcrumb)}</div>
+          <div class="tv-text">${esc(t.nome)}</div>
+        </div>
       </div>`;
     }).join('')}` : '';
 
