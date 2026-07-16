@@ -2765,9 +2765,11 @@ function renderPersoneDrawer(){
     const cat = proj?.categoria_id ? S.categorie.find(c=>c.id===proj.categoria_id) : null;
     const sub = proj?.sottocategoria_id ? S.sottocategorie.find(s=>s.id===proj.sottocategoria_id) : null;
     const breadcrumb = [cat?.nome, sub?.nome, proj?.nome].filter(Boolean).join(' | ');
-    return `<div class="pd-item" onclick="openTaskDetail('${t.id}')" title="Apri nel board">
-      <span class="pd-stato-dot" style="background:${statiColor[t.stato]||'var(--g300)'}"></span>
+    const prioStyle = t.is_prioritario ? 'border-left:3px solid var(--orange);padding-left:10px;' : '';
+    return `<div class="pd-item" onclick="openTaskDetail('${t.id}')" title="Apri nel board" style="${prioStyle}">
+      <span class="pd-stato-dot" style="background:${t.is_prioritario?'var(--orange)':statiColor[t.stato]||'var(--g300)'}"></span>
       <div style="flex:1;">
+        ${t.is_prioritario?`<div style="font-size:10px;color:var(--orange);font-weight:700;margin-bottom:1px;">⚡ Prioritario</div>`:''}
         <div class="pd-text">${esc(t.nome)}</div>
         ${breadcrumb?`<div class="pd-meta">${esc(breadcrumb)}</div>`:''}
       </div>
